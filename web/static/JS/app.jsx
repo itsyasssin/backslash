@@ -525,7 +525,7 @@ const Header = ({ loading, state }) => {
   );
 };
 
-const Tag = ({ tag, loading = false }) => {
+const Tag = ({ tag, loading = false ,onClick=()=>{}}) => {
   if (loading) {
     return (
       <div className="fadeInLoad relative overflow-hidden rounded-full h-5 w-16 bg-gray-200 mr-2" />
@@ -534,7 +534,7 @@ const Tag = ({ tag, loading = false }) => {
     return (
       <Link
         name={`# ${tag.name}`}
-        onClick={setTitle}
+        onClick={(e)=>{setTitle(e);onClick(tag.name)}}
         to={`/t/${tag.name}`}
         className={`hover:underline focus-visible:underline mr-2 text-${genColor(
           tag.id
@@ -575,7 +575,7 @@ const Fallowing = ({ user, loading }) => {
   }
 };
 
-const Post = ({ post = {}, loading, onTitle = () => {} }) => {
+const Post = ({ post = {}, loading, onTitle = () => {} ,tagClick=()=>{}}) => {
   const [isBookmark, setIsBookmark] = useState(post.bookmark);
   const [data, setData] = useContext(Context);
 
@@ -686,7 +686,7 @@ const Post = ({ post = {}, loading, onTitle = () => {} }) => {
         <div className="tags flex mt-3 items-center justify-between">
           <div className="relative flex items-center whitespace-pre w-9/12 overflow-hidden  after:bg-gradient-to-l after:from-white after:to-transparent after:right-0 after:absolute after:h-full after:w-6">
             {post.tags.map((tag) => (
-              <Tag tag={tag} key={tag.id} />
+              <Tag tag={tag} key={tag.id} onClick={tagClick}/>
             ))}
           </div>
 
@@ -1007,10 +1007,10 @@ const TagView = ({}) => {
 
   const url = useParams();
 
-  const getTag = () => {
+  const getTag = (name=url.name) => {
     $.ajax({
       method: "POST",
-      url: `/api/t/${url.name}`,
+      url: `/api/t/${name}`,
       data: { csrfmiddlewaretoken: data.csrfmiddlewaretoken },
       success: (r) => {
         setTag({ ...r.tag, ["isReady"]: true });
@@ -1158,7 +1158,7 @@ const TagView = ({}) => {
 
             <div id="postsContainer">
               {posts.isReady
-                ? posts.items.map((p) => <Post post={p} key={p.id} />)
+                ? posts.items.map((p) => <Post post={p} key={p.id} tagClick={getTag} />)
                 : [1, 2, 3, 4, 5].map((i) => <Post loading={true} key={i} />)}
               {posts.hasNext && posts.isReady ? <Loading /> : ""}
             </div>
