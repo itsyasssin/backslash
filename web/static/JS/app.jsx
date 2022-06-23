@@ -3865,18 +3865,13 @@ const PostDetail = ({}) => {
                     </Link>
                     <span className="text-gray-500 text-sm">
                       {timeSince(comment.date)}
+                      <button onClick={() => setReplayTo(comment)} className="border-[1px] border-indigo-500 inline mx-1 px-2 rounded-full sm:border-2 text-indigo-500">Replay</button>
                     </span>
                   </div>
                 </div>
               </div>
               <p className="text-sm mt-1  text-gray-800">
                 {comment.text}
-                <span
-                  onClick={() => setReplayTo(comment)}
-                  className="ml-2 pt-2 text-indigo-500 cursor-pointer"
-                >
-                  "Replay"
-                </span>
               </p>
             </div>
             <div className="ml-6 my-2">
