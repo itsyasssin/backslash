@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BACKSLASH - Verify</title>
+    <script src="{% static 'CSS/tailwind' %}"></script>
+</head>
+<body>
+    <main class="flex flex-col justify-between items-center w-full h-screen relative ">
+        <span name="tmp"></span>
+        <form
+          class="p-4 flex items-center max-w-[20rem] min-w-[15rem] flex-col justify-center relative"
+          method="POST"
+          onSubmit={handleSubmit}
+        >
+    
+          <h1 class="text-2xl font-medium my-4">
+            Error
+          </h1>
+          <p class="p2-1 pb-2 text-slate-600">
+            Sorry your token is not currect.
+          </p>
+            <a
+              href="/accounts/join"
+              class="px-4 py-3 w-full mt-1 rounded-full active:scale-[0.98] transition-all flex items-center justify-center bg-gray-900 text-white font-semibold text-lg "
+            >
+              Try again
+            </a>
+        </form>
+  
+        <span class="text-slate-600 py-4 text-sm opacity-100">
+          © backslash.com {% now "Y" %}. All right reserved.
+        </span>
+      </main>
+</body>
+</html>

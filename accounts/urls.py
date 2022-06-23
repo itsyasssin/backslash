@@ -9,4 +9,5 @@ urlpatterns = [
     path('join', auth, name='sign_up'),
     path('reset', reset_pass, name='reset_pass'),
     path('reset-password', change_pass, name='change_pass'),
+    path('verify', verify, name='verify'),
 ]

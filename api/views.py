@@ -49,8 +49,11 @@ def sign_up(request):
     
     if form.is_valid():
         user = form.save()
-        login(request, user)
-    
+        user.is_active = False
+        user.save()
+        # TODO: Send email
+        print(f"toke: {Token.generate(user).pk}")
+
     return JsonResponse(errors_to_json(form))
 
 @require_POST
@@ -75,7 +78,8 @@ def reset_pass_form(request):
         
         if form.is_valid():
             user = form.save()
-            login(request,user)
+            if request.user.is_authenticated:
+                login(request,user)
 
         return JsonResponse(errors_to_json(form)|{'csrfmiddlewaretoken': csrf.get_token(request)})
     return JsonResponse({'result': 0,'message': 'This token is not valid.'})

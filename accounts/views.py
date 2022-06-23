@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render
+from django.contrib.auth import  login
 from .models import Token
 
 def auth(request):
@@ -24,3 +25,17 @@ def change_pass(request):
         context['is_valid'] = 1
         
     return render(request, 'index.html', context)
+
+def verify(request):
+
+    if request.user.is_authenticated:
+        redirect('/me/settings')
+
+    token = request.GET.get('token','')
+    if this_token:=Token.check_token(token):
+
+        login(request, this_token.user)
+        redirect('/me/settings')
+        
+    return render(request, 'verify.html')
+
