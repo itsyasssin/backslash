@@ -884,9 +884,7 @@ const Home = ({}) => {
   }, [tags]);
 
   useEffect(() => {
-    const load = document.querySelector(
-      "#fallowingUsersContainer .loading"
-    );
+    const load = document.querySelector("#fallowingUsersContainer .loading");
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -2251,74 +2249,80 @@ const MeView = ({}) => {
     });
   };
   const getFallowers = () => {
-    $.ajax({
-      method: "POST",
-      url: "/api/me/fallowers",
-      data: {
-        csrfmiddlewaretoken: data.csrfmiddlewaretoken,
-        page: fallowers.items.length / 15,
-      },
-      success: (r) => {
-        if (r.result) {
-          r["items"] = fallowers.items.concat(r.items);
-          r["isReady"] = true;
-          setFallowers(r);
-        } else {
-          showMsg("An unexpected error occurred");
-        }
-      },
-      error: () => {
-        showMsg("An unknown network error has occurred");
-        setTimeout(getFallowers, 10000);
-      },
-    });
+    if (fallowers.hasNext) {
+      $.ajax({
+        method: "POST",
+        url: "/api/me/fallowers",
+        data: {
+          csrfmiddlewaretoken: data.csrfmiddlewaretoken,
+          page: fallowers.items.length / 15,
+        },
+        success: (r) => {
+          if (r.result) {
+            r["items"] = fallowers.items.concat(r.items);
+            r["isReady"] = true;
+            setFallowers(r);
+          } else {
+            showMsg("An unexpected error occurred");
+          }
+        },
+        error: () => {
+          showMsg("An unknown network error has occurred");
+          setTimeout(getFallowers, 10000);
+        },
+      });
+    }
   };
 
   const getFallowings = () => {
-    $.ajax({
-      method: "POST",
-      url: "/api/me/fallowings",
-      data: {
-        csrfmiddlewaretoken: data.csrfmiddlewaretoken,
-        page: fallowings.items.length / 15 + 1,
-      },
-      success: (r) => {
-        if (r.result) {
-          r["items"] = fallowings.items.concat(r.items);
-          r["isReady"] = true;
-          setFallowings(r);
-        } else {
-          showMsg("An unexpected error occurred");
-        }
-      },
-      error: () => {
-        showMsg("An unknown network error has occurred");
-        setTimeout(getFallowings, 10000);
-      },
-    });
+    if (fallowings.hasNext) {
+      $.ajax({
+        method: "POST",
+        url: "/api/me/fallowings",
+        data: {
+          csrfmiddlewaretoken: data.csrfmiddlewaretoken,
+          page: fallowings.items.length / 15 + 1,
+        },
+        success: (r) => {
+          if (r.result) {
+            r["items"] = fallowings.items.concat(r.items);
+            r["isReady"] = true;
+            setFallowings(r);
+          } else {
+            showMsg("An unexpected error occurred");
+          }
+        },
+        error: () => {
+          showMsg("An unknown network error has occurred");
+          setTimeout(getFallowings, 10000);
+        },
+      });
+    }
   };
   const getTags = () => {
-    $.ajax({
-      method: "POST",
-      url: "/api/me/tags",
-      data: {
-        csrfmiddlewaretoken: data.csrfmiddlewaretoken,
-        page: tags.items.length / 15 + 1,
-      },
-      success: (r) => {
-        if (r.result) {
-          r["items"] = tags.items.concat(r.items);
-          r["isReady"] = true;
-          setTags(r);
-        } else {
-          showMsg("An unexpected error occurred");
-        }
-      },
-      error: () => {
-        showMsg("An unknown network error has occurred");
-        setTimeout(getTags, 10000);
-      },
-    });
+    if (tags.hasNext) {
+      $.ajax({
+        method: "POST",
+        url: "/api/me/tags",
+        data: {
+          csrfmiddlewaretoken: data.csrfmiddlewaretoken,
+          page: tags.items.length / 15 + 1,
+        },
+        success: (r) => {
+          if (r.result) {
+            r["items"] = tags.items.concat(r.items);
+            r["isReady"] = true;
+            setTags(r);
+          } else {
+            showMsg("An unexpected error occurred");
+          }
+        },
+        error: () => {
+          showMsg("An unknown network error has occurred");
+          setTimeout(getTags, 10000);
+        },
+      });
+    }
   };
 
   const getBase = () => {
@@ -2366,7 +2370,7 @@ const MeView = ({}) => {
     }, [1]);
 
     useEffect(() => {
-      const load = document.querySelector("#postsContainer .loading");
+      const load = document.querySelector("#itemsContainer .loading");
 
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
@@ -2392,13 +2396,7 @@ const MeView = ({}) => {
         onClick={closeSide}
         className={`bg-[#00000078] backdrop-blur-sm fixed w-screen h-screen right-0 top-0 flex flex-col-reverse sm:flex-row-reverse z-20 `}
       >
-        <div
-          className={`${
-            showSide == sideName
-              ? "translate-0"
-              : "translate-y-[100%] sm:translate-x-[100%] sm:translate-y-0"
-          } transition-all border-2 border-gray-100 flex flex-col z-20 bg-white absolute rounded-tr-3xl rounded-tl-3xl w-full h-4/5 sm:rounded-tr-none sm:rounded-bl-3xl sm:h-full sm:w-[28rem]`}
-        >
+        <div className="transition-all border-2 border-gray-100 flex flex-col z-20 bg-white absolute rounded-tr-3xl rounded-tl-3xl w-full h-4/5 sm:rounded-tr-none sm:rounded-bl-3xl sm:h-full sm:w-[28rem]">
           <button
             id="close"
             className="p-2 w-full flex items-center justify-center sm:w-auto sm:h-full sm:left-0 sm:absolute"
@@ -2733,7 +2731,9 @@ const PeopleView = ({}) => {
                   {user.fallowed ? "Unfallow" : "Fallow"}
                 </button>
               </div>
-              <p dir="auto" className="my-4 text-gray-700">{user.bio}</p>
+              <p dir="auto" className="my-4 text-gray-700">
+                {user.bio}
+              </p>
             </div>
           ) : (
             <div>
