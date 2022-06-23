@@ -119,6 +119,13 @@
                 <Route path="/accounts/join">
                   <Auth page="join" />
                 </Route>
+                <Route path="/accounts/reset">
+                  
+                  <ResetPassword isSent={ {{ token_sent|default:0 }} }/>
+                </Route>
+                <Route path="/accounts/reset-password">
+                  <ChangePassword isValid={ {{ is_valid|default:0 }} } token={ "{{request.GET.token|default:''}}" } />
+                </Route>
     
               </Switch>
             <Navbar state={state} loading={!isReady} />
@@ -134,6 +141,6 @@
     };
     
     ReactDOM.render(<App />, document.getElementById('root'));
-    
+    console.log("{{is_valid}}")    
   </script>
 </html>

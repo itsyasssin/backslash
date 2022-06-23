@@ -3,6 +3,7 @@ from uuid import uuid4
 
 import cv2
 from django.conf import settings
+from datetime import datetime, timedelta, timezone
 from django.contrib.auth.models import AbstractUser
 from django.core import files, validators
 from django.db import models
@@ -146,3 +147,30 @@ class MyUser(AbstractUser):
         query = list(cls.objects.filter(Q(name__icontains=text)|Q( username__istartswith=text)))
         query.sort(key=lambda user: user.fallowers.count() + (user.posts.count()*2))
         return query[:100]
+
+
+
+class Token(models.Model):
+    id = models.CharField(max_length=200, unique=True, primary_key=True)
+    user = models.ForeignKey('accounts.MyUser', verbose_name=_("کاربر"), on_delete=models.CASCADE, related_name="user_tokens")
+    date = models.DateTimeField(auto_now=True)
+    
+    @classmethod
+    def generate(cls, user):
+        id = str(uuid4()).replace('-','')
+        cls.objects.filter(user=user).delete()
+        return cls.objects.create(id=id, user=user)
+
+    @classmethod
+    def check_token(cls, token):
+        try:
+
+            token = cls.objects.get(pk=token)
+            now = datetime.now(tz=timezone.utc)
+            return token if now - token.date < timedelta(minutes=5) else False
+            
+        except:
+            return False
+
+    def __str__(self):
+        return self.user.username

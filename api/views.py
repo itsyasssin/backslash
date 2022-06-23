@@ -5,7 +5,7 @@ import numpy as np
 from accounts.forms import SignUpForm, UpdateUser
 from django.conf import settings
 from django.contrib.auth import get_user_model, login, logout
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, SetPasswordForm
 from django.contrib.sessions.models import Session
 from django.core.paginator import Paginator
 from django.http import Http404
@@ -16,6 +16,7 @@ from PIL import Image
 from posts.forms import CommentForm, ImageForm, PostForm
 from posts.models import Post, Tag
 from django.core.exceptions import ObjectDoesNotExist
+from accounts.models import Token
 User = get_user_model()
 
 
@@ -63,6 +64,21 @@ def change_password(request):
         login(request,user)
 
     return JsonResponse(errors_to_json(form)|{'csrfmiddlewaretoken': csrf.get_token(request)})
+
+@require_POST
+def reset_pass_form(request):
+    token = request.POST.get('token','')
+    if Token.check_token(token):
+        request.POST = clean_data(request.POST)
+
+        form = SetPasswordForm(request.user, request.POST)
+        
+        if form.is_valid():
+            user = form.save()
+            login(request,user)
+
+        return JsonResponse(errors_to_json(form)|{'csrfmiddlewaretoken': csrf.get_token(request)})
+    return JsonResponse({'result': 0,'message': 'This token is not valid.'})
 
 @require_POST
 def log_out(request):
@@ -544,6 +560,23 @@ def like_post(request, username, slug):
     except:
         return JsonResponse({'result': 0})
 
+@require_POST
+def reset_pass(request):
+    user = request.user
+    if user.is_authenticated:
+        # TODO: send email 
+        print(f"toke: {Token.generate(user).pk}")
+        return JsonResponse({'result': 1})
+        
+    username = request.POST.get('username','')
+    query = User.objects.filter(username=username)
+    if query.exists():
+        # TODO: send email 
+        user = query.first()
+        print(f"toke: {Token.generate(user).pk}")
+        return JsonResponse({'result': 1})
+    return JsonResponse({'result': 0,'username': 'This user does not exist.'})
+
 @require_GET
 def base_home(request):
     user = request.user if request.user.is_authenticated else None
@@ -604,3 +637,4 @@ def base_user(request, username):
         return JsonResponse(res)
     except ObjectDoesNotExist:
         raise Http404
+

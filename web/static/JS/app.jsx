@@ -294,13 +294,267 @@ const Auth = ({ page }) => {
           {status[0].toUpperCase() + status.slice(1) + (isLoading ? "..." : "")}
         </button>
         <Link
+          name="Reset password"
+          onClick={setTitle}
+          to="/accounts/reset"
+          className={`w-full text-center pt-4 text-indigo-600 hover:text-indigo-500 cursor-pointer`}
+        >
+          Reset password
+        </Link>
+        <Link
           name={status}
           onClick={hanldeClickHelpBtn}
           to={about[status]["helpurl"]}
-          className={`w-full text-center pt-4 text-indigo-600 hover:text-indigo-500 cursor-pointer`}
+          className={`w-full text-center pt-2 text-indigo-600 hover:text-indigo-500 cursor-pointer`}
         >
           {about[status]["help"]}
         </Link>
+      </form>
+
+      <span className="text-slate-600 py-4 text-sm opacity-100">
+        {`© backslash.com ${year}. All right reserved.`}
+      </span>
+    </main>
+  );
+};
+
+const ResetPassword = ({ isSent = false }) => {
+  const [data, setData] = useContext(Context);
+  const [formData, setFormData] = useState({
+    csrfmiddlewaretoken: data.csrfmiddlewaretoken,
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const year = new Date().getFullYear();
+  const [messages, setMessages] = useState({});
+  const [sent, setSent] = useState(isSent);
+
+  const manageData = (e) => {
+    setMessages({});
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const submit = () => {
+    $.ajax({
+      method: "POST",
+      url: "/api/accounts/reset",
+      data: formData,
+      success: (r) => {
+        console.log(r);
+        setIsLoading(false);
+        if (r.result) {
+          setSent(true);
+        }
+        setMessages(r);
+      },
+      error: () => {
+        showMsg("An unknown network error has occurred");
+      },
+    });
+  };
+  useEffect(() => {
+    if (data.me.id && !sent) {
+      submit();
+    }
+  }, [1]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setMessages({});
+    setIsLoading(true);
+    submit();
+  };
+
+  return (
+    <main className="flex flex-col justify-between items-center w-full h-screen relative ">
+      <span name="tmp"></span>
+      <form
+        className="p-4 flex items-center max-w-[20rem] min-w-[15rem] flex-col justify-center relative"
+        method="POST"
+        onSubmit={handleSubmit}
+      >
+        <h1 className="text-2xl font-medium my-4">
+          {sent ? "Sent" : "Reset Password"}
+        </h1>
+        <p className="p2-1 pb-2 text-slate-600">
+          {sent
+            ? "We send an email to you with reset code"
+            : "Reset you password with digital code"}
+        </p>
+        {sent ? (
+          ""
+        ) : (
+          <div className="w-full my-1 text-lg flex flex-col">
+            <input
+              className="border-gray-300 border-b-2 py-1 placeholder:text-gray-600 w-full focus:border-gray-500 focus:placeholder:text-gray-700"
+              type="text"
+              maxLength="30"
+              pattern="^(?!.*\.\.)(?!.*\.$)[^\W][a-z0-9_.]{2,29}$"
+              name="username"
+              placeholder="Username"
+              onChange={manageData}
+              required={true}
+            />
+            <span
+              className={`text-sm text-red-500 pt-1 ${
+                messages.username ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              {messages.username || "Invalid username. e.g user.n_ame"}
+            </span>
+          </div>
+        )}
+        {sent ? (
+          <Link
+            to="/me/settings"
+            className="px-4 py-3 w-full mt-1 rounded-full active:scale-[0.98] transition-all flex items-center justify-center bg-gray-900 text-white font-semibold text-lg "
+          >
+            Back
+          </Link>
+        ) : (
+          <button
+            type="submit"
+            className={`px-4 py-3 w-full mt-1 rounded-full active:scale-[0.98] transition-all flex items-center justify-center bg-gray-900 text-white font-semibold text-lg ${
+              isLoading ? "opacity-50 cursor-wait" : ""
+            }`}
+          >
+            Submit{isLoading ? "..." : ""}
+          </button>
+        )}
+      </form>
+
+      <span className="text-slate-600 py-4 text-sm opacity-100">
+        {`© backslash.com ${year}. All right reserved.`}
+      </span>
+    </main>
+  );
+};
+
+const ChangePassword = ({ isValid = false, token='' }) => {
+  const [data, setData] = useContext(Context);
+  const [formData, setFormData] = useState({
+    csrfmiddlewaretoken: data.csrfmiddlewaretoken,
+    token: token,
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const year = new Date().getFullYear();
+  const [messages, setMessages] = useState({});
+  const [changed, setChanged] = useState(!isValid);
+
+  const manageData = (e) => {
+    setMessages({});
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const submit = () => {
+    $.ajax({
+      method: "POST",
+      url: "/api/accounts/reset-password",
+      data: formData,
+      success: (r) => {
+        console.log(r);
+        setIsLoading(false);
+        if (r.result) {
+          setChanged(true);
+          setData({...data,['csrfmiddlewaretoken']:r.csrfmiddlewaretoken})
+        }
+        setMessages(r);
+      },
+      error: () => {
+        showMsg("An unknown network error has occurred");
+      },
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setMessages({});
+    setIsLoading(true);
+    submit();
+  };
+
+  return (
+    <main className="flex flex-col justify-between items-center w-full h-screen relative ">
+      <span name="tmp"></span>
+      <form
+        className="p-4 flex items-center max-w-[20rem] min-w-[15rem] flex-col justify-center relative"
+        method="POST"
+        onSubmit={handleSubmit}
+      >
+  
+        <h1 className="text-2xl font-medium my-4">
+          {!isValid?"Token expired": changed ? "Done":"Change Password"}
+        </h1>
+        <p className="p2-1 pb-2 text-slate-600">
+          {messages.message||(!isValid?"This token is not valid.":changed ? "Your password successfully changed." : "")}
+        </p>
+        {changed ? (
+          ""
+        ) : (
+          <div className="w-full my-1 text-lg flex flex-col">
+            <input
+              className="border-gray-300 border-b-2 py-1 placeholder:text-gray-600 w-full focus:border-gray-500 focus:placeholder:text-gray-700"
+              type="password"
+              name="new_password1"
+              placeholder="New password"
+              autoComplete="new-password"
+              onChange={manageData}
+              pattern=".{8,}"
+              required={true}
+            />
+            <span
+              className={`text-sm text-red-500 pt-1 ${
+                messages.new_password1 ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              {messages.new_password1 || "Password is too short."}
+            </span>
+          </div>
+        )}
+        {changed ? (
+          ""
+        ) : (
+          <div className="w-full my-1 text-lg flex flex-col">
+            <input
+              className="border-gray-300 border-b-2 py-1 placeholder:text-gray-600 w-full focus:border-gray-500 focus:placeholder:text-gray-700"
+              type="password"
+              name="new_password2"
+              placeholder="Retype new password"
+              autoComplete="new-password"
+              onChange={manageData}
+              required={true}
+            />
+            <span
+              className={`text-sm text-red-500 pt-1 ${
+                messages.new_password2 ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              {messages.new_password2 || "."}
+            </span>
+          </div>
+        )}
+        {changed || !isValid? (
+          <Link
+            to="/"
+            className="px-4 py-3 w-full mt-1 rounded-full active:scale-[0.98] transition-all flex items-center justify-center bg-gray-900 text-white font-semibold text-lg "
+          >
+            Back
+          </Link>
+        ) : (
+          <button
+            disabled={
+              !(
+                formData.new_password1 == formData.new_password2 &&
+                formData.new_password1
+              )
+            }
+            type="submit"
+            className={`px-4 py-3 w-full mt-1 rounded-full active:scale-[0.98] transition-all flex items-center justify-center bg-gray-900 text-white font-semibold text-lg disabled:opacity-50 disabled:pointer-events-none ${
+              isLoading ? "opacity-50 cursor-wait" : ""
+            }`}
+          >
+            Submit{isLoading ? "..." : ""}
+          </button>
+        )}
       </form>
 
       <span className="text-slate-600 py-4 text-sm opacity-100">
@@ -525,7 +779,7 @@ const Header = ({ loading, state }) => {
   );
 };
 
-const Tag = ({ tag, loading = false ,onClick=()=>{}}) => {
+const Tag = ({ tag, loading = false, onClick = () => {} }) => {
   if (loading) {
     return (
       <div className="fadeInLoad relative overflow-hidden rounded-full h-5 w-16 bg-gray-200 mr-2" />
@@ -534,7 +788,10 @@ const Tag = ({ tag, loading = false ,onClick=()=>{}}) => {
     return (
       <Link
         name={`# ${tag.name}`}
-        onClick={(e)=>{setTitle(e);onClick(tag.name)}}
+        onClick={(e) => {
+          setTitle(e);
+          onClick(tag.name);
+        }}
         to={`/t/${tag.name}`}
         className={`hover:underline focus-visible:underline mr-2 text-${genColor(
           tag.id
@@ -575,7 +832,12 @@ const Fallowing = ({ user, loading }) => {
   }
 };
 
-const Post = ({ post = {}, loading, onTitle = () => {} ,tagClick=()=>{}}) => {
+const Post = ({
+  post = {},
+  loading,
+  onTitle = () => {},
+  tagClick = () => {},
+}) => {
   const [isBookmark, setIsBookmark] = useState(post.bookmark);
   const [data, setData] = useContext(Context);
 
@@ -686,7 +948,7 @@ const Post = ({ post = {}, loading, onTitle = () => {} ,tagClick=()=>{}}) => {
         <div className="tags flex mt-3 items-center justify-between">
           <div className="relative flex items-center whitespace-pre w-9/12 overflow-hidden  after:bg-gradient-to-l after:from-white after:to-transparent after:right-0 after:absolute after:h-full after:w-6">
             {post.tags.map((tag) => (
-              <Tag tag={tag} key={tag.id} onClick={tagClick}/>
+              <Tag tag={tag} key={tag.id} onClick={tagClick} />
             ))}
           </div>
 
@@ -1007,7 +1269,7 @@ const TagView = ({}) => {
 
   const url = useParams();
 
-  const getTag = (name=url.name) => {
+  const getTag = (name = url.name) => {
     $.ajax({
       method: "POST",
       url: `/api/t/${name}`,
@@ -1158,7 +1420,9 @@ const TagView = ({}) => {
 
             <div id="postsContainer">
               {posts.isReady
-                ? posts.items.map((p) => <Post post={p} key={p.id} tagClick={getTag} />)
+                ? posts.items.map((p) => (
+                    <Post post={p} key={p.id} tagClick={getTag} />
+                  ))
                 : [1, 2, 3, 4, 5].map((i) => <Post loading={true} key={i} />)}
               {posts.hasNext && posts.isReady ? <Loading /> : ""}
             </div>
@@ -3421,7 +3685,8 @@ const SettingsView = ({}) => {
                         disabled={
                           !(
                             formData.old_password &&
-                            formData.new_password1 == formData.new_password2
+                            formData.new_password1 == formData.new_password2 &&
+                            formData.new_password1
                           )
                         }
                         className={`px-4 py-3 w-full mt-1 rounded-full active:scale-[0.98] transition-all flex items-center justify-center bg-gray-900 text-white font-semibold text-lg disabled:opacity-50 disabled:pointer-events-none ${
@@ -3430,6 +3695,14 @@ const SettingsView = ({}) => {
                       >
                         {isLoading ? "Changing..." : "Change"}
                       </button>
+                      <Link
+                        name="Reset Password"
+                        onClick={setTitle}
+                        to="/accounts/reset"
+                        className="text-indigo-500 mt-3"
+                      >
+                        Reset password
+                      </Link>
                     </form>
                   </div>
                 </div>
@@ -3865,14 +4138,17 @@ const PostDetail = ({}) => {
                     </Link>
                     <span className="text-gray-500 text-sm">
                       {timeSince(comment.date)}
-                      <button onClick={() => setReplayTo(comment)} className="border-[1px] border-indigo-500 inline mx-1 px-2 rounded-full sm:border-2 text-indigo-500">Replay</button>
+                      <button
+                        onClick={() => setReplayTo(comment)}
+                        className="border-[1px] border-indigo-500 inline mx-1 px-2 rounded-full sm:border-2 text-indigo-500"
+                      >
+                        Replay
+                      </button>
                     </span>
                   </div>
                 </div>
               </div>
-              <p className="text-sm mt-1  text-gray-800">
-                {comment.text}
-              </p>
+              <p className="text-sm mt-1  text-gray-800">{comment.text}</p>
             </div>
             <div className="ml-6 my-2">
               {(comment.responses || []).map((i) => (
