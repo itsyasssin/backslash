@@ -39,13 +39,13 @@ class Post(models.Model):
         return f'{self.title}'
     
     def as_json(self, user=None):
-        author_fallowed = user in self.user.fallowers if user else False
+        author_followed = user in self.user.followers if user else False
         liked = user in self.liked_users.all() if user else False
         bookmark = self in user.bookmarks if user else False
 
         data = {
             'id': self.pk,
-            'user': self.user.as_json(user)|{"fallowed": author_fallowed },
+            'user': self.user.as_json(user)|{"followed": author_followed },
             'title': self.title,
             'text': self.text,
             'date': self.date,
@@ -69,9 +69,9 @@ class Post(models.Model):
         return self.post_comment.all().filter(replaied_to=None)
 
     @classmethod
-    def fallowings(cls, user):
+    def followings(cls, user):
         result = []
-        for i in user.fallowings:
+        for i in user.followings:
             result += [post for post in i.posts]
         return result
         
@@ -100,7 +100,7 @@ class Post(models.Model):
         else:
             query = list(Post.objects.all())
         
-        query.sort(key=lambda x: x.like_count + (1.5*x.comments.count()) + (x.date.timestamp()) + ((100 if x.user in user.fallowings else 0) if user else 0), reverse=True)
+        query.sort(key=lambda x: x.like_count + (1.5*x.comments.count()) + (x.date.timestamp()) + ((100 if x.user in user.followings else 0) if user else 0), reverse=True)
 
         return query
 
@@ -108,15 +108,15 @@ class Tag(models.Model):
     name = models.SlugField(max_length=50, unique=True)
 
     @property
-    def fallowers(self):
+    def followers(self):
         return self.users.all()
 
     def as_json(self, user=None):
         data = {
             'id': self.pk, 
             'name': self.name,
-            'fallowers': self.fallowers.count(),
-            'fallowed':  self in user.tags if user else False
+            'followers': self.followers.count(),
+            'followed':  self in user.tags if user else False
             }
         return data
         
@@ -125,7 +125,7 @@ class Tag(models.Model):
     @property
     def top(cls):
         query = list(cls.objects.all())
-        query.sort(key=lambda tag: tag.fallowers.count(), reverse=True)
+        query.sort(key=lambda tag: tag.followers.count(), reverse=True)
         return query[:100]
 
     @classmethod
@@ -134,7 +134,7 @@ class Tag(models.Model):
             return []
 
         query = list(cls.objects.filter(name__istartswith=text))
-        query.sort(key=lambda tag: tag.fallowers.count(), reverse=True)
+        query.sort(key=lambda tag: tag.followers.count(), reverse=True)
         return query[:100]
 
     @property

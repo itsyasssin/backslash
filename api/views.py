@@ -199,10 +199,10 @@ def latest_posts(request):
 
 
 @require_POST
-def my_fallowers(request):
+def my_followers(request):
     user = request.user
     if user.is_authenticated:
-        p = Paginator(user.fallowers, 15)
+        p = Paginator(user.followers, 15)
         num_page = request.POST.get('page',1)
         this_page = p.get_page(num_page)
         data = [i.as_json(user) for i in this_page.object_list]
@@ -212,10 +212,10 @@ def my_fallowers(request):
     return JsonResponse({'result': 0})
 
 @require_POST
-def my_fallowings(request):
+def my_followings(request):
     user = request.user
     if user.is_authenticated:
-        p = Paginator(user.fallowings, 15)
+        p = Paginator(user.followings, 15)
         num_page = request.POST.get('page',1)
         this_page = p.get_page(num_page)
         data = [i.as_json(user) for i in this_page.object_list]
@@ -521,23 +521,23 @@ def delete_post(request, id):
 
 
 @require_POST
-def fallow_people(request, username):
+def follow_people(request, username):
     user = request.user
     try:
         assert user.is_authenticated
         other = User.objects.get(username=username)
-        user.fallow_people(other)
+        user.follow_people(other)
         return JsonResponse({'result': 1})
     except:
         return JsonResponse({'result': 0})
 
 @require_POST
-def fallow_tags(request, name):
+def follow_tags(request, name):
     user = request.user
     try:
         assert user.is_authenticated
         tag = Tag.objects.get(name=name)
-        user.fallow_tags(tag)
+        user.follow_tags(tag)
         return JsonResponse({'result': 1})
     except:
         return JsonResponse({'result': 0})
@@ -588,7 +588,7 @@ def base_home(request):
     res['rec'] = {'items': [i.as_json(user) for i in Post.recommendeds(user)[:15]], 'hasNext': len(Post.recommendeds(user))>=15}
     if user:
         res['tags'] = {'items': [i.as_json() for i in user.tags[:15]], 'hasNext': user.tags.count()>=15}
-        res['fallowings'] = {'items': [i.as_json() for i in user.fallowings[:15]], 'hasNext': user.fallowings.count()>=15}
+        res['followings'] = {'items': [i.as_json() for i in user.followings[:15]], 'hasNext': user.followings.count()>=15}
         res['me'] = user.as_json()
     return JsonResponse(res)
 

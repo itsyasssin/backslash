@@ -28,14 +28,14 @@ class MyUser(AbstractUser):
     email = models.EmailField(_('email address'), unique=True)
     profile = models.ImageField(_('profile image'), blank=True, upload_to='users/')
     first_name = last_name = None  # use name instead of first_name and last_name
-    fallowing_users = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='fallower_users')
-    fallowing_tags = models.ManyToManyField('posts.tag', blank=True, related_name='users')
+    following_users = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='follower_users')
+    following_tags = models.ManyToManyField('posts.tag', blank=True, related_name='users')
     bookmarks_post = models.ManyToManyField('posts.Post', blank=True, related_name='bookmarked_users')
     readed = models.ManyToManyField('posts.Post', blank=True, related_name='readed')
 
     @property
     def tags(self):
-        return self.fallowing_tags.all()
+        return self.following_tags.all()
 
     @property
     def bookmarks(self):
@@ -50,8 +50,8 @@ class MyUser(AbstractUser):
         return sum([i.image.size for i in self.images])
 
     @property
-    def fallowings(self):
-        return self.fallowing_users.all()
+    def followings(self):
+        return self.following_users.all()
 
     @property
     def posts(self):
@@ -62,8 +62,8 @@ class MyUser(AbstractUser):
         return self.user_posts.filter(user=self, published=False)
 
     @property
-    def fallowers(self):
-        return self.fallower_users.all()
+    def followers(self):
+        return self.follower_users.all()
 
     def __str__(self) -> str:
         return f"{self.username}"
@@ -109,26 +109,26 @@ class MyUser(AbstractUser):
             'bio': self.bio,
             'email': self.email,
             'profile': self.profile.url if self.profile else '',
-            'fallowers': self.fallowers.count(),
-            'fallowings' : self.fallowings.count(),
+            'followers': self.followers.count(),
+            'followings' : self.followings.count(),
             'tags': self.tags.count(),
-            'fallowed': (user in self.fallowers) or (user in self.tags) if user else False,
+            'followed': (user in self.followers) or (user in self.tags) if user else False,
         }
         return data
 
-    def fallow_people(self, user):
-        if user in self.fallowings:
-            self.fallowing_users.remove(user)
+    def follow_people(self, user):
+        if user in self.followings:
+            self.following_users.remove(user)
         else:
-            self.fallowing_users.add(user)
+            self.following_users.add(user)
             
         return True
 
-    def fallow_tags(self, tag):
+    def follow_tags(self, tag):
         if tag in self.tags:
-            self.fallowing_tags.remove(tag)
+            self.following_tags.remove(tag)
         else:
-            self.fallowing_tags.add(tag)
+            self.following_tags.add(tag)
             
         return True
 
@@ -136,7 +136,7 @@ class MyUser(AbstractUser):
     @property
     def top(cls):
         query = list(cls.objects.all())
-        query.sort(key=lambda user: user.fallowers.count() + (user.posts.count()*2))
+        query.sort(key=lambda user: user.followers.count() + (user.posts.count()*2))
         return query[:100]
         
     @classmethod
@@ -145,7 +145,7 @@ class MyUser(AbstractUser):
             return []
 
         query = list(cls.objects.filter(Q(name__icontains=text)|Q( username__istartswith=text)))
-        query.sort(key=lambda user: user.fallowers.count() + (user.posts.count()*2))
+        query.sort(key=lambda user: user.followers.count() + (user.posts.count()*2))
         return query[:100]
 
 

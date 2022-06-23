@@ -803,7 +803,7 @@ const Tag = ({ tag, loading = false, onClick = () => {} }) => {
   }
 };
 
-const Fallowing = ({ user, loading }) => {
+const Following = ({ user, loading }) => {
   if (loading) {
     return (
       <div className="fadeInLoad relative rounded-full overflow-hidden w-12 h-12 bg-gray-200 mr-3" />
@@ -979,10 +979,10 @@ const Post = ({
 };
 
 const Home = ({}) => {
-  const [fallowings, setFallowings] = useState({ items: [], hasNext: true });
+  const [followings, setFollowings] = useState({ items: [], hasNext: true });
   const [rec, setRec] = useState({ items: [], hasNext: true });
   const [latests, setLatests] = useState({ items: [], hasNext: true });
-  const [fallowingUsers, setFallowingUsers] = useState({
+  const [followingUsers, setFollowingUsers] = useState({
     items: [],
     hasNext: true,
   });
@@ -1037,26 +1037,26 @@ const Home = ({}) => {
       },
     });
   };
-  const getFallowingUsers = () => {
+  const getFollowingUsers = () => {
     $.ajax({
       method: "POST",
-      url: "/api/me/fallowings",
+      url: "/api/me/followings",
       data: {
         csrfmiddlewaretoken: data.csrfmiddlewaretoken,
-        page: fallowingUsers.items.length / 15 + 1,
+        page: followingUsers.items.length / 15 + 1,
       },
       success: (r) => {
         if (r.result) {
-          r["items"] = fallowingUsers.items.concat(r.items);
+          r["items"] = followingUsers.items.concat(r.items);
           r["isReady"] = true;
-          setFallowingUsers(r);
+          setFollowingUsers(r);
         } else {
           showMsg("An unexpected error occurred");
         }
       },
       error: () => {
         showMsg("An unknown network error has occurred");
-        setTimeout(getFallowingUsers, 10000);
+        setTimeout(getFollowingUsers, 10000);
       },
     });
   };
@@ -1094,7 +1094,7 @@ const Home = ({}) => {
       success: (r) => {
         setRec({ ...r.rec, ["isReady"]: true });
         if (r.me) {
-          setFallowingUsers({ ...r.fallowings, ["isReady"]: true });
+          setFollowingUsers({ ...r.followings, ["isReady"]: true });
           setTags({ ...r.tags, ["isReady"]: true });
           setData({ ...data, ["me"]: r.me || {} });
         }
@@ -1146,19 +1146,19 @@ const Home = ({}) => {
   }, [tags]);
 
   useEffect(() => {
-    const load = document.querySelector("#fallowingUsersContainer .loading");
+    const load = document.querySelector("#followingUsersContainer .loading");
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          getFallowingUsers();
+          getFollowingUsers();
         }
       });
     });
     if (load) {
       observer.observe(load);
     }
-  }, [fallowingUsers]);
+  }, [followingUsers]);
 
   return (
     <main>
@@ -1183,15 +1183,15 @@ const Home = ({}) => {
           )}
           {data.me.id ? (
             <div
-              id="fallowingUsersContainer"
+              id="followingUsersContainer"
               className="py-2 my-4 flex overflow-auto"
             >
-              {fallowingUsers.isReady
-                ? fallowingUsers.items.map((i) => (
-                    <Fallowing user={i} key={i.id} />
+              {followingUsers.isReady
+                ? followingUsers.items.map((i) => (
+                    <Following user={i} key={i.id} />
                   ))
-                : [1, 2, 3].map((i) => <Fallowing loading={true} key={i} />)}
-              {fallowingUsers.hasNext && fallowingUsers.isReady ? (
+                : [1, 2, 3].map((i) => <Following loading={true} key={i} />)}
+              {followingUsers.hasNext && followingUsers.isReady ? (
                 <div className="h-12 w-12 text-xl loading px-4">
                   <span className="m-auto">...</span>
                 </div>
@@ -1332,15 +1332,15 @@ const TagView = ({}) => {
     getTag();
   }, [1]);
 
-  const fallow = () => {
+  const follow = () => {
     if (data.me.id) {
       $.ajax({
         method: "POST",
-        url: `/api/fallow/${tag.name}`,
+        url: `/api/follow/${tag.name}`,
         data: { csrfmiddlewaretoken: data.csrfmiddlewaretoken, id: tag.id },
         success: (r) => {
           if (r.result) {
-            setTag({ ...tag, ["fallowed"]: !tag.fallowed });
+            setTag({ ...tag, ["followed"]: !tag.followed });
           } else {
             showMsg("An unknown error has occurred");
           }
@@ -1374,19 +1374,19 @@ const TagView = ({}) => {
                   <div className="flex flex-col">
                     <h1 className="text-lg sm:text-xl ">{tag.name}</h1>
                     <span className="text-gray-500">
-                      {nFormatter(tag.fallowers)} fallowers
+                      {nFormatter(tag.followers)} followers
                     </span>
                   </div>
                 </div>
                 <button
-                  onClick={fallow}
+                  onClick={follow}
                   className={`py-1 px-3 rounded-full active:scale-[0.98] transition-all focus-visible:scale-110 ${
-                    tag.fallowed
+                    tag.followed
                       ? "text-indigo-500 border-2 border-indigo-500 bg-white"
                       : "text-white bg-indigo-500"
                   } `}
                 >
-                  {tag.fallowed ? "Unfallow" : "Fallow"}
+                  {tag.followed ? "Unfollow" : "Follow"}
                 </button>
               </div>
             ) : (
@@ -1435,17 +1435,17 @@ const TagView = ({}) => {
 
 const PeopleItem = ({ user = {}, inSearch, loading }) => {
   const [data, setData] = useContext(Context);
-  const [fallowed, setFallowed] = useState(user.fallowed);
+  const [followed, setFollowed] = useState(user.followed);
 
-  const fallow = () => {
+  const follow = () => {
     if (data.me.id) {
       $.ajax({
         method: "POST",
-        url: `/api/fallow/@${user.username}`,
+        url: `/api/follow/@${user.username}`,
         data: { csrfmiddlewaretoken: data.csrfmiddlewaretoken, id: user.id },
         success: (r) => {
           if (r.result) {
-            setFallowed(!fallowed);
+            setFollowed(!followed);
           } else {
             showMsg("An unknown error has occurred");
           }
@@ -1484,7 +1484,7 @@ const PeopleItem = ({ user = {}, inSearch, loading }) => {
           <div className="ml-2 w-full overflow-hidden">
             <h1 className="text-xl truncate">{user.name}</h1>
             <span className="text-gray-500 whitespace-pre">
-              {inSearch ? nFormatter(user.fallowers) + " Fallowers" : user.bio}
+              {inSearch ? nFormatter(user.followers) + " Followers" : user.bio}
             </span>
           </div>
         </Link>
@@ -1495,12 +1495,12 @@ const PeopleItem = ({ user = {}, inSearch, loading }) => {
         </div>
       ) : (
         <button
-          onClick={fallow}
+          onClick={follow}
           className={`py-1 px-3 mx-2 rounded-full active:scale-[0.98] transition-all border-2 border-indigo-500 focus-visible:scale-110 ${
-            fallowed ? "text-indigo-500 bg-white" : "text-white bg-indigo-500"
+            followed ? "text-indigo-500 bg-white" : "text-white bg-indigo-500"
           } `}
         >
-          {fallowed ? "Unfallow" : "Fallow"}
+          {followed ? "Unfollow" : "Follow"}
         </button>
       )}
     </div>
@@ -1509,17 +1509,17 @@ const PeopleItem = ({ user = {}, inSearch, loading }) => {
 
 const TagItem = ({ tag = {}, loading }) => {
   const [data, setData] = useContext(Context);
-  const [fallowed, setFallowed] = useState(tag.fallowed);
+  const [followed, setFollowed] = useState(tag.followed);
 
-  const fallow = () => {
+  const follow = () => {
     if (data.me.id) {
       $.ajax({
         method: "POST",
-        url: `/api/fallow/${tag.name}`,
+        url: `/api/follow/${tag.name}`,
         data: { csrfmiddlewaretoken: data.csrfmiddlewaretoken, id: tag.id },
         success: (r) => {
           if (r.result) {
-            setFallowed(!fallowed);
+            setFollowed(!followed);
           } else {
             showMsg("An unknown error has occurred");
           }
@@ -1562,7 +1562,7 @@ const TagItem = ({ tag = {}, loading }) => {
               </Link>
             </h1>
             <span className="text-gray-500 whitespace-pre">
-              {nFormatter(tag.fallowers)} Fallowers
+              {nFormatter(tag.followers)} Followers
             </span>
           </div>
         </div>
@@ -1571,12 +1571,12 @@ const TagItem = ({ tag = {}, loading }) => {
         <div className="py-1 px-3 rounded-full bg-gray-200 relative fadeInLoad overflow-hidden  w-20 h-8" />
       ) : (
         <button
-          onClick={fallow}
+          onClick={follow}
           className={`py-1 px-3 mx-2 rounded-full active:scale-[0.98] transition-all border-2 border-indigo-500 focus-visible:scale-110 ${
-            fallowed ? "text-indigo-500  bg-white" : "text-white bg-indigo-500"
+            followed ? "text-indigo-500  bg-white" : "text-white bg-indigo-500"
           } `}
         >
-          {fallowed ? "Unfallow" : "Fallow"}
+          {followed ? "Unfollow" : "Follow"}
         </button>
       )}
     </div>
@@ -2401,7 +2401,7 @@ const WriteView = ({}) => {
                                   {i.name}
                                 </h1>
                                 <span className="text-sm text-gray-500 ">
-                                  {nFormatter(i.fallowers || 0)} Fallowers
+                                  {nFormatter(i.followers || 0)} Followers
                                 </span>
                               </div>
                             </div>
@@ -2461,8 +2461,8 @@ const MeView = ({}) => {
   const [showSide, setShowSide] = useState(null);
   const [posts, setPosts] = useState({ items: [], hasNext: true });
   const [dposts, setDposts] = useState({ items: [], hasNext: true });
-  const [fallowers, setFallowers] = useState({ items: [], hasNext: true });
-  const [fallowings, setFallowings] = useState({ items: [], hasNext: true });
+  const [followers, setFollowers] = useState({ items: [], hasNext: true });
+  const [followings, setFollowings] = useState({ items: [], hasNext: true });
   const [tags, setTags] = useState({ items: [], hasNext: true });
 
   const getPosts = () => {
@@ -2512,53 +2512,53 @@ const MeView = ({}) => {
       },
     });
   };
-  const getFallowers = () => {
-    if (fallowers.hasNext) {
+  const getFollowers = () => {
+    if (followers.hasNext) {
       $.ajax({
         method: "POST",
-        url: "/api/me/fallowers",
+        url: "/api/me/followers",
         data: {
           csrfmiddlewaretoken: data.csrfmiddlewaretoken,
-          page: fallowers.items.length / 15,
+          page: followers.items.length / 15,
         },
         success: (r) => {
           if (r.result) {
-            r["items"] = fallowers.items.concat(r.items);
+            r["items"] = followers.items.concat(r.items);
             r["isReady"] = true;
-            setFallowers(r);
+            setFollowers(r);
           } else {
             showMsg("An unexpected error occurred");
           }
         },
         error: () => {
           showMsg("An unknown network error has occurred");
-          setTimeout(getFallowers, 10000);
+          setTimeout(getFollowers, 10000);
         },
       });
     }
   };
 
-  const getFallowings = () => {
-    if (fallowings.hasNext) {
+  const getFollowings = () => {
+    if (followings.hasNext) {
       $.ajax({
         method: "POST",
-        url: "/api/me/fallowings",
+        url: "/api/me/followings",
         data: {
           csrfmiddlewaretoken: data.csrfmiddlewaretoken,
-          page: fallowings.items.length / 15 + 1,
+          page: followings.items.length / 15 + 1,
         },
         success: (r) => {
           if (r.result) {
-            r["items"] = fallowings.items.concat(r.items);
+            r["items"] = followings.items.concat(r.items);
             r["isReady"] = true;
-            setFallowings(r);
+            setFollowings(r);
           } else {
             showMsg("An unexpected error occurred");
           }
         },
         error: () => {
           showMsg("An unknown network error has occurred");
-          setTimeout(getFallowings, 10000);
+          setTimeout(getFollowings, 10000);
         },
       });
     }
@@ -2616,8 +2616,8 @@ const MeView = ({}) => {
   const closeSide = (e) => {
     if (e.target.id == "close") {
       setShowSide(null);
-      setFallowings({ items: [], hasNext: true });
-      setFallowers({ items: [], hasNext: true });
+      setFollowings({ items: [], hasNext: true });
+      setFollowers({ items: [], hasNext: true });
       setTags({ items: [], hasNext: true });
     }
   };
@@ -2626,10 +2626,10 @@ const MeView = ({}) => {
     useEffect(() => {
       if (sideName == "tags") {
         getTags();
-      } else if (sideName == "fallowings") {
-        getFallowings();
-      } else if (sideName == "fallowers") {
-        getFallowers();
+      } else if (sideName == "followings") {
+        getFollowings();
+      } else if (sideName == "followers") {
+        getFollowers();
       }
     }, [1]);
 
@@ -2639,10 +2639,10 @@ const MeView = ({}) => {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            if (sideName == "fallowings") {
-              getFallowings();
-            } else if (sideName == "fallowers") {
-              getFallowers();
+            if (sideName == "followings") {
+              getFollowings();
+            } else if (sideName == "followers") {
+              getFollowers();
             } else if (sideName == "tags") {
               getTags();
             }
@@ -2652,7 +2652,7 @@ const MeView = ({}) => {
       if (load) {
         observer.observe(load);
       }
-    }, [fallowers, fallowings, tags]);
+    }, [followers, followings, tags]);
 
     return (
       <div
@@ -2680,32 +2680,32 @@ const MeView = ({}) => {
                 ))
               : ""}
 
-            {sideName == "fallowers" && fallowers.isReady
-              ? fallowers.items.map((item) => (
+            {sideName == "followers" && followers.isReady
+              ? followers.items.map((item) => (
                   <PeopleItem user={item} key={item.id} />
                 ))
-              : sideName == "fallowers"
+              : sideName == "followers"
               ? [1, 2, 3, 4, 5, , 6, 7, 8, 9].map((item) => (
                   <PeopleItem loading={true} key={item.id} />
                 ))
               : ""}
 
-            {sideName == "fallowings" && fallowings.isReady
-              ? fallowings.items.map((item) => (
+            {sideName == "followings" && followings.isReady
+              ? followings.items.map((item) => (
                   <PeopleItem user={item} key={item.id} />
                 ))
-              : sideName == "fallowings"
+              : sideName == "followings"
               ? [1, 2, 3, 4, 5, , 6, 7, 8, 9].map((item) => (
                   <PeopleItem loading={true} key={item} />
                 ))
               : ""}
 
-            {(sideName == "fallowings" &&
-              fallowings.isReady &&
-              fallowings.hasNext) ||
-            (sideName == "fallowers" &&
-              fallowers.isReady &&
-              fallowers.hasNext) ||
+            {(sideName == "followings" &&
+              followings.isReady &&
+              followings.hasNext) ||
+            (sideName == "followers" &&
+              followers.isReady &&
+              followers.hasNext) ||
             (sideName == "tags" && tags.isReady && tags.hasNext) ? (
               <Loading />
             ) : (
@@ -2751,29 +2751,29 @@ const MeView = ({}) => {
                 <div className="flex w-full justify-around">
                   <button
                     onClick={() => {
-                      setShowSide("fallowers");
+                      setShowSide("followers");
                     }}
                     className="flex flex-col sm:flex-row items-center focus-visible:scale-110  "
                   >
-                    {nFormatter(data.me.fallowers)}
-                    <span className="text-gray-500 sm:ml-2">Fallowers</span>
+                    {nFormatter(data.me.followers)}
+                    <span className="text-gray-500 sm:ml-2">Followers</span>
                   </button>
-                  {showSide == "fallowers" ? (
-                    <Container sideName="fallowers" />
+                  {showSide == "followers" ? (
+                    <Container sideName="followers" />
                   ) : (
                     ""
                   )}
                   <button
                     onClick={() => {
-                      setShowSide("fallowings");
+                      setShowSide("followings");
                     }}
                     className="flex flex-col sm:flex-row items-center focus-visible:scale-110  "
                   >
-                    {nFormatter(data.me.fallowings)}
-                    <span className="text-gray-500 sm:ml-2">Fallowings</span>
+                    {nFormatter(data.me.followings)}
+                    <span className="text-gray-500 sm:ml-2">Followings</span>
                   </button>
-                  {showSide == "fallowings" ? (
-                    <Container sideName="fallowings" />
+                  {showSide == "followings" ? (
+                    <Container sideName="followings" />
                   ) : (
                     ""
                   )}
@@ -2799,11 +2799,11 @@ const MeView = ({}) => {
 
                 <div className="flex w-[60%] justify-around">
                   <button className="flex flex-col sm:flex-row items-center">
-                    <span className="text-gray-500 sm:ml-2">Fallowers</span>
+                    <span className="text-gray-500 sm:ml-2">Followers</span>
                   </button>
 
                   <button className="flex flex-col sm:flex-row items-center">
-                    <span className="text-gray-500 sm:ml-2">Fallowings</span>
+                    <span className="text-gray-500 sm:ml-2">Followings</span>
                   </button>
 
                   <button className="flex flex-col sm:flex-row items-center">
@@ -2937,15 +2937,15 @@ const PeopleView = ({}) => {
     getBase();
   }, [1]);
 
-  const fallow = () => {
+  const follow = () => {
     if (data.me.id) {
       $.ajax({
         method: "POST",
-        url: `/api/fallow/@${user.username}`,
+        url: `/api/follow/@${user.username}`,
         data: { csrfmiddlewaretoken: data.csrfmiddlewaretoken, id: user.id },
         success: (r) => {
           if (r.result) {
-            setUser({ ...user, ["fallowed"]: !user.fallowed });
+            setUser({ ...user, ["followed"]: !user.followed });
           } else {
             showMsg("An unknown error has occurred");
           }
@@ -2980,19 +2980,19 @@ const PeopleView = ({}) => {
                       </small>
                     </h1>
                     <span className="text-gray-500 whitespace-pre">
-                      {nFormatter(user.fallowers)} Fallowers
+                      {nFormatter(user.followers)} Followers
                     </span>
                   </div>
                 </div>
                 <button
-                  onClick={fallow}
+                  onClick={follow}
                   className={`py-1 px-3 mx-2 rounded-full active:scale-[0.98] transition-all border-2 border-indigo-500 focus-visible:scale-110 ${
-                    user.fallowed
+                    user.followed
                       ? "text-indigo-500  bg-white"
                       : "text-white bg-indigo-500"
                   } `}
                 >
-                  {user.fallowed ? "Unfallow" : "Fallow"}
+                  {user.followed ? "Unfollow" : "Follow"}
                 </button>
               </div>
               <p dir="auto" className="my-4 text-gray-700">
@@ -3975,11 +3975,11 @@ const PostDetail = ({}) => {
     }
   }, [posts]);
 
-  const fallow = () => {
+  const follow = () => {
     if (data.me.id) {
       $.ajax({
         method: "POST",
-        url: `/api/fallow/@${post.user.username}`,
+        url: `/api/follow/@${post.user.username}`,
         data: {
           csrfmiddlewaretoken: data.csrfmiddlewaretoken,
           id: post.user.id,
@@ -3988,7 +3988,7 @@ const PostDetail = ({}) => {
           if (r.result) {
             setPost({
               ...post,
-              ["user"]: { ...post.user, ["fallowed"]: !post.user.fallowed },
+              ["user"]: { ...post.user, ["followed"]: !post.user.followed },
             });
           }
         },
@@ -4373,14 +4373,14 @@ const PostDetail = ({}) => {
                     </Link>
                   ) : (
                     <button
-                      onClick={fallow}
+                      onClick={follow}
                       className={`py-1 px-3 rounded-full active:scale-[0.98] transition-all border-2 border-indigo-500 focus-visible:scale-110 ${
-                        post.user.fallowed
+                        post.user.followed
                           ? "text-indigo-500  bg-white"
                           : "text-white bg-indigo-500"
                       } `}
                     >
-                      {post.user.fallowed ? "Unfallow" : "Fallow"}
+                      {post.user.followed ? "Unfollow" : "Follow"}
                     </button>
                   )}
                 </div>
