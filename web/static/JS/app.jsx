@@ -953,7 +953,7 @@ const Home = ({}) => {
                   state == "rec" ? "border-gray-900" : "opacity-[0.75]"
                 }`}
               >
-                Recommended
+                Explore
               </button>
               <button
                 onClick={() => {

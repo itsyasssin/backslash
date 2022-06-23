@@ -91,6 +91,18 @@ class Post(models.Model):
         # use like count and post length and post date to roder 
         query.sort(key=lambda post: post.like_count + len(post.text) * 0.01 + (post.date.timestamp()*2), reverse=True)
         return query[:100]
+        
+    @classmethod
+    def recommendeds(cls, user=None):
+        # this is not a recommended system but work well :)
+        if user:
+            query = list(set(Post.objects.all())^set(user.readed.all()))
+        else:
+            query = list(Post.objects.all())
+        
+        query.sort(key=lambda x: x.like_count + (1.5*x.comments.count()) + (x.date.timestamp()) + ((100 if x.user in user.fallowings else 0) if user else 0), reverse=True)
+
+        return query
 
 class Tag(models.Model):
     name = models.SlugField(max_length=50, unique=True)

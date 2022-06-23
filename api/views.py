@@ -158,8 +158,14 @@ def edit(request):
 
 @require_POST
 def rec_posts(request):
-    # this section still not work
-    return JsonResponse({'result': 1, 'items': []})
+    user = request.user if request.user.is_authenticated else None
+    query = Post.recommendeds(user)
+    p = Paginator(query, 15)
+    num_page = request.POST.get('page',1)
+    this_page = p.get_page(num_page)
+    data = [i.as_json(user) for i in this_page.object_list]
+
+    return JsonResponse({'result': 1, 'items': data, 'hasNext': this_page.has_next()})
 
 @require_POST
 def latest_posts(request):
@@ -357,6 +363,11 @@ def post_detail(request, username, slug):
         user = request.user if request.user.is_authenticated else None
         other = User.objects.get(username=username)
         post = Post.objects.get(slug=slug, user=other)
+
+        if user :
+            user.readed.add(post)
+            user.save()
+            
         res = {}
         res['me'] = user.as_json() if user else {}
         res['post'] = post.as_json(user)
@@ -537,7 +548,7 @@ def like_post(request, username, slug):
 def base_home(request):
     user = request.user if request.user.is_authenticated else None
     res = {}
-    res['rec'] = {'items': [], 'hasNext': False}
+    res['rec'] = {'items': [i.as_json(user) for i in Post.recommendeds(user)[:15]], 'hasNext': len(Post.recommendeds(user))>=15}
     if user:
         res['tags'] = {'items': [i.as_json() for i in user.tags[:15]], 'hasNext': user.tags.count()>=15}
         res['fallowings'] = {'items': [i.as_json() for i in user.fallowings[:15]], 'hasNext': user.fallowings.count()>=15}
