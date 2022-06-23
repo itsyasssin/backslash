@@ -30,6 +30,7 @@ class MyUser(AbstractUser):
     fallowing_users = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='fallower_users')
     fallowing_tags = models.ManyToManyField('posts.tag', blank=True, related_name='users')
     bookmarks_post = models.ManyToManyField('posts.Post', blank=True, related_name='bookmarked_users')
+    readed = models.ManyToManyField('posts.Post', blank=True, related_name='readed')
 
     @property
     def tags(self):
