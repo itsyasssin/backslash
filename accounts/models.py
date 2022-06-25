@@ -32,7 +32,9 @@ class MyUser(AbstractUser):
     following_tags = models.ManyToManyField('posts.tag', blank=True, related_name='users')
     bookmarks_post = models.ManyToManyField('posts.Post', blank=True, related_name='bookmarked_users')
     readed = models.ManyToManyField('posts.Post', blank=True, related_name='readed')
-
+    verified = models.BooleanField(_("verified"), default=False)
+    
+    
     @property
     def tags(self):
         return self.following_tags.all()

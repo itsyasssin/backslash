@@ -183,7 +183,7 @@ const Auth = ({ page }) => {
         success: (r) => {
           setIsLoading(false);
           if (r.result) {
-            document.location = "/";
+            setStatus("finall");
           }
           setMessages(r);
         },
@@ -208,109 +208,126 @@ const Auth = ({ page }) => {
   return (
     <main className="flex flex-col justify-between items-center w-full h-screen relative ">
       <span name="tmp"></span>
-      <form
-        className="p-4 flex items-center max-w-[20rem] min-w-[15rem] flex-col justify-center relative"
-        method="POST"
-        onSubmit={handleSubmit}
-      >
-        <h1 className="text-2xl font-medium my-4">
-          {status[0].toUpperCase() + status.slice(1)}
-        </h1>
-        {about[status]["about"] && (
-          <p className="p2-1 pb-2 text-slate-600">{about[status]["about"]}</p>
-        )}
-        <div className="w-full my-1 text-lg flex flex-col">
-          <input
-            className="border-gray-300 border-b-2 py-1 placeholder:text-gray-600 w-full focus:border-gray-500 focus:placeholder:text-gray-700"
-            type="text"
-            maxLength="30"
-            pattern="^(?!.*\.\.)(?!.*\.$)[^\W][a-z0-9_.]{2,29}$"
-            name="username"
-            placeholder="Username"
-            onChange={manageData}
-            required={true}
-          />
-          <span
-            className={`text-sm text-red-500 pt-1 ${
-              messages.username || messages.__all__
-                ? "opacity-100"
-                : "opacity-0"
-            }`}
-          >
-            {messages.username ||
-              messages.__all__ ||
-              "Invalid username. e.g user.n_ame"}
-          </span>
-        </div>
+      {status == "finall" ? (
+        <div className="p-4 flex items-center max-w-[20rem] min-w-[15rem] flex-col justify-center relative">
+          <h1 className="text-2xl font-medium my-4">Successful !</h1>
+          <p className="p2-1 pb-2 text-slate-600">
+            We send an email to you with reset code
+          </p>
 
-        <div className="w-full my-1 text-lg flex flex-col">
-          <input
-            className="border-gray-300 border-b-2 py-1 placeholder:text-gray-600 w-full focus:border-gray-500 focus:placeholder:text-gray-700"
-            type="password"
-            name="password"
-            placeholder="Password"
-            pattern={status === "join" ? ".{8,}" : ".*"}
-            onChange={manageData}
-            required={true}
-          />
-          <span
-            className={`text-sm ${
-              status == "join" ? "text-red-500" : "text-white"
-            } pt-1 ${messages.password2 ? "opacity-100" : "opacity-0"}`}
+          <Link
+            to="/"
+            className="px-4 py-3 w-full mt-1 rounded-full active:scale-[0.98] transition-all flex items-center justify-center bg-gray-900 text-white font-semibold text-lg "
           >
-            {messages.password2 ||
-              (status == "join" ? "This password is too short." : "|")}
-          </span>
+            Home
+          </Link>
         </div>
-
-        {status == "join" ? (
+      ) : (
+        <form
+          className="p-4 flex items-center max-w-[20rem] min-w-[15rem] flex-col justify-center relative"
+          method="POST"
+          onSubmit={handleSubmit}
+        >
+          <h1 className="text-2xl font-medium my-4">
+            {status[0].toUpperCase() + status.slice(1)}
+          </h1>
+          {about[status]["about"] && (
+            <p className="p2-1 pb-2 text-slate-600">{about[status]["about"]}</p>
+          )}
           <div className="w-full my-1 text-lg flex flex-col">
             <input
               className="border-gray-300 border-b-2 py-1 placeholder:text-gray-600 w-full focus:border-gray-500 focus:placeholder:text-gray-700"
-              type="email"
-              name="email"
-              placeholder="Email"
+              type="text"
+              maxLength="30"
+              pattern="^(?!.*\.\.)(?!.*\.$)[^\W][a-z0-9_.]{2,29}$"
+              name="username"
+              placeholder="Username"
               onChange={manageData}
               required={true}
             />
             <span
               className={`text-sm text-red-500 pt-1 ${
-                messages.email ? "opacity-100" : "opacity-0"
+                messages.username || messages.__all__
+                  ? "opacity-100"
+                  : "opacity-0"
               }`}
             >
-              {messages.email || "Invalid email. e.g email@exaple.com"}
+              {messages.username ||
+                messages.__all__ ||
+                "Invalid username. e.g user.n_ame"}
             </span>
           </div>
-        ) : (
-          ""
-        )}
 
-        <button
-          type="submit"
-          className={`px-4 py-3 w-full mt-1 rounded-full active:scale-[0.98] transition-all flex items-center justify-center bg-gray-900 text-white font-semibold text-lg ${
-            isLoading ? "opacity-50 cursor-wait" : ""
-          }`}
-        >
-          {status[0].toUpperCase() + status.slice(1) + (isLoading ? "..." : "")}
-        </button>
-        <Link
-          name="Reset password"
-          onClick={setTitle}
-          to="/accounts/reset"
-          className={`w-full text-center pt-4 text-indigo-600 hover:text-indigo-500 cursor-pointer`}
-        >
-          Reset password
-        </Link>
-        <Link
-          name={status}
-          onClick={hanldeClickHelpBtn}
-          to={about[status]["helpurl"]}
-          className={`w-full text-center pt-2 text-indigo-600 hover:text-indigo-500 cursor-pointer`}
-        >
-          {about[status]["help"]}
-        </Link>
-      </form>
+          <div className="w-full my-1 text-lg flex flex-col">
+            <input
+              className="border-gray-300 border-b-2 py-1 placeholder:text-gray-600 w-full focus:border-gray-500 focus:placeholder:text-gray-700"
+              type="password"
+              name="password"
+              placeholder="Password"
+              pattern={status === "join" ? ".{8,}" : ".*"}
+              onChange={manageData}
+              required={true}
+            />
+            <span
+              className={`text-sm ${
+                status == "join" ? "text-red-500" : "text-white"
+              } pt-1 ${messages.password2 ? "opacity-100" : "opacity-0"}`}
+            >
+              {messages.password2 ||
+                (status == "join" ? "This password is too short." : "|")}
+            </span>
+          </div>
 
+          {status == "join" ? (
+            <div className="w-full my-1 text-lg flex flex-col">
+              <input
+                className="border-gray-300 border-b-2 py-1 placeholder:text-gray-600 w-full focus:border-gray-500 focus:placeholder:text-gray-700"
+                type="email"
+                name="email"
+                placeholder="Email"
+                onChange={manageData}
+                required={true}
+              />
+              <span
+                className={`text-sm text-red-500 pt-1 ${
+                  messages.email ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {messages.email || "Invalid email. e.g email@exaple.com"}
+              </span>
+            </div>
+          ) : (
+            ""
+          )}
+
+          <button
+            type="submit"
+            className={`px-4 py-3 w-full mt-1 rounded-full active:scale-[0.98] transition-all flex items-center justify-center bg-gray-900 text-white font-semibold text-lg ${
+              isLoading ? "opacity-50 cursor-wait" : ""
+            }`}
+          >
+            {status[0].toUpperCase() +
+              status.slice(1) +
+              (isLoading ? "..." : "")}
+          </button>
+          <Link
+            name="Reset password"
+            onClick={setTitle}
+            to="/accounts/reset"
+            className={`w-full text-center pt-4 text-indigo-600 hover:text-indigo-500 cursor-pointer`}
+          >
+            Reset password
+          </Link>
+          <Link
+            name={status}
+            onClick={hanldeClickHelpBtn}
+            to={about[status]["helpurl"]}
+            className={`w-full text-center pt-2 text-indigo-600 hover:text-indigo-500 cursor-pointer`}
+          >
+            {about[status]["help"]}
+          </Link>
+        </form>
+      )}
       <span className="text-slate-600 py-4 text-sm opacity-100">
         {`© backslash.com ${year}. All right reserved.`}
       </span>
@@ -429,7 +446,7 @@ const ResetPassword = ({ isSent = false }) => {
   );
 };
 
-const ChangePassword = ({ isValid = false, token='' }) => {
+const ChangePassword = ({ isValid = false, token = "" }) => {
   const [data, setData] = useContext(Context);
   const [formData, setFormData] = useState({
     csrfmiddlewaretoken: data.csrfmiddlewaretoken,
@@ -455,7 +472,7 @@ const ChangePassword = ({ isValid = false, token='' }) => {
         setIsLoading(false);
         if (r.result) {
           setChanged(true);
-          setData({...data,['csrfmiddlewaretoken']:r.csrfmiddlewaretoken})
+          setData({ ...data, ["csrfmiddlewaretoken"]: r.csrfmiddlewaretoken });
         }
         setMessages(r);
       },
@@ -480,12 +497,16 @@ const ChangePassword = ({ isValid = false, token='' }) => {
         method="POST"
         onSubmit={handleSubmit}
       >
-  
         <h1 className="text-2xl font-medium my-4">
-          {!isValid?"Token expired": changed ? "Done":"Change Password"}
+          {!isValid ? "Token expired" : changed ? "Done" : "Change Password"}
         </h1>
         <p className="p2-1 pb-2 text-slate-600">
-          {messages.message||(!isValid?"This token is not valid.":changed ? "Your password successfully changed." : "")}
+          {messages.message ||
+            (!isValid
+              ? "This token is not valid."
+              : changed
+              ? "Your password successfully changed."
+              : "")}
         </p>
         {changed ? (
           ""
@@ -532,7 +553,7 @@ const ChangePassword = ({ isValid = false, token='' }) => {
             </span>
           </div>
         )}
-        {changed || !isValid? (
+        {changed || !isValid ? (
           <Link
             to="/"
             className="px-4 py-3 w-full mt-1 rounded-full active:scale-[0.98] transition-all flex items-center justify-center bg-gray-900 text-white font-semibold text-lg "

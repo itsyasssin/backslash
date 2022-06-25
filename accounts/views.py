@@ -33,9 +33,11 @@ def verify(request):
 
     token = request.GET.get('token','')
     if this_token:=Token.check_token(token):
-
+        this_token.user.is_active = True
+        this_token.user.verified = True
+        this_token.user.save()
         login(request, this_token.user)
-        redirect('/me/settings')
+        return redirect('/me/settings')
         
     return render(request, 'verify.html')
 

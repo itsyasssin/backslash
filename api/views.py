@@ -42,8 +42,11 @@ def sign_up(request):
 
     passwd = request.POST.get('password')
     username = request.POST.get('username')
-    clean = {'password1': passwd, 'password2': passwd, 'username': username.lower(),'name': username.lower()}
+    clean = {'password1': passwd, 'password2': passwd, 'username': username.lower()}
     request.POST = clean_data(request.POST)|clean
+    
+    # delete unverified users
+    User.objects.filter(username=request.POST.get('username'), verified=False).delete()
 
     form = SignUpForm(request.POST)
     
