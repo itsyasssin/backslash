@@ -26,7 +26,7 @@ class MyUser(AbstractUser):
     name = models.CharField(_('full name'), blank=True, max_length=50)
     bio = models.CharField(_('biography'), blank=True, max_length=150)
     email = models.EmailField(_('email address'), unique=True)
-    profile = models.ImageField(_('profile image'), blank=True, upload_to='users/')
+    profile = models.ImageField(_('profile image'), default='simple.jpg', upload_to='users/')
     first_name = last_name = None  # use name instead of first_name and last_name
     following_users = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='follower_users')
     following_tags = models.ManyToManyField('posts.tag', blank=True, related_name='users')

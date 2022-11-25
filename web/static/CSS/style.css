@@ -173,6 +173,8 @@ article hr{
 }
 article p{
   overflow-y: hidden;
+  margin: 1rem 0;
+  opacity: 0.85;
 }
 
 article :is(ul,ol) :is(ul,ol){
