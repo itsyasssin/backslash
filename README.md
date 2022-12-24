@@ -2,7 +2,7 @@
 Backslash is a blog system using Markdown to write posts. Every user can write post and follow other users and hashtags. (EMAIL SYSTEM IS NOT READY) 
 
 ## TODO
-- [ ] Email system
+- [x] Email system
 
 ## Index page
 ![index page](./screenshots/index.png)

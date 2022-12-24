@@ -12,8 +12,10 @@ def reset_pass(request):
     context = {'title': 'Reset password'}
     user = request.user
     if user.is_authenticated:
-        # TODO: send email
-        print(f"toke: {Token.generate(user).pk}")
+        token = Token.generate(user).pk
+        print(f"toke: {token}")
+        link = f'{request.get_host()}/accounts/reset-password?token={token}'
+        user.send_email('Reset Password', 'email/reset.txt', 'email/reset.html', {'name': user.name, 'link': link})
         context['token_sent'] = 1
 
     return render(request, 'index.html', context)

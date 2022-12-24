@@ -1,0 +1,2 @@
+Hey {{name}}
+Your password has been changed in {% now "Y-m-d H:i" %}.

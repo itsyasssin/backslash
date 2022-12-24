@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-v-%%vtu!##(pbbsqs+v#3*2t5p^h2yi^u2*b8dw@artm4!m6f2
 DEBUG = True
 
 # for debug level 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -136,3 +136,10 @@ MAX_USER_UPLOAD = 100_000_000 # 100MB
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.MyUser'
+
+# Email
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = '' # insert email address
+EMAIL_HOST_PASSWORD = ''  # insert your own password
+EMAIL_PORT = '587'

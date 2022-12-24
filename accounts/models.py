@@ -10,7 +10,8 @@ from django.db import models
 from django.db.models import Q
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import gettext_lazy as _
-
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
 
 @deconstructible
 class UsernameValidator(validators.RegexValidator):
@@ -149,6 +150,14 @@ class MyUser(AbstractUser):
         query = list(cls.objects.filter(Q(name__icontains=text)|Q( username__istartswith=text)))
         query.sort(key=lambda user: user.followers.count() + (user.posts.count()*2))
         return query[:100]
+
+    
+    def send_email(self, subject, plaintext, htmltext, context):
+        plain = get_template(plaintext).render(context)
+        html = get_template(htmltext).render(context)
+        msg = EmailMultiAlternatives(subject, plain, to=[self.email])
+        msg.attach_alternative(html, 'text/html')
+        return msg.send()
 
 
 

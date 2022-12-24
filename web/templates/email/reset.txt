@@ -1,0 +1,4 @@
+Hey {{name}}
+For reset your password, go to below link.
+
+[ link ] {{link}}

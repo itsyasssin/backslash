@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BACKSLASH - Verify</title>
-    <script src="{% static 'CSS/tailwind' %}"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
     <main class="flex flex-col justify-between items-center w-full h-screen relative ">
@@ -32,7 +32,7 @@
         </form>
   
         <span class="text-slate-600 py-4 text-sm opacity-100">
-          © backslash.com {% now "Y" %}. All right reserved.
+          © {{host}} {% now "Y" %}. All right reserved.
         </span>
       </main>
 </body>

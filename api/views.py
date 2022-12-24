@@ -31,7 +31,11 @@ def sign_in(request):
     form = AuthenticationForm(request, request.POST)
     
     if form.is_valid():
-        login(request, form.get_user())
+        user = form.get_user()
+        login(request, user)
+        data = {'name': user.username}
+        data['host'] = request.get_host()
+        user.send_email('Login to Backslash', 'email/login.txt', 'email/login.html', data)
     
     return JsonResponse(errors_to_json(form))
 
@@ -46,7 +50,7 @@ def sign_up(request):
     request.POST = clean_data(request.POST)|clean
     
     # delete unverified users
-    User.objects.filter(username=request.POST.get('username'), verified=False).delete()
+    User.objects.filter(username=username, verified=False).delete()
 
     form = SignUpForm(request.POST)
     
@@ -54,8 +58,16 @@ def sign_up(request):
         user = form.save()
         user.is_active = False
         user.save()
-        # TODO: Send email
-        print(f"toke: {Token.generate(user).pk}")
+        
+        token = Token.generate(user).pk
+        
+        if settings.DEBUG:
+            print(f"[token] {token}")
+        
+        data = {'name': user.username}
+        data['host'] = request.get_host()
+        data['link'] = f"{request.META['wsgi.url_scheme']}://{data['host']}/accounts/verify?token={token}"
+        user.send_email('Welcome to Backslash', 'email/verify.txt', 'email/verify.html', data)
 
     return JsonResponse(errors_to_json(form))
 
@@ -67,8 +79,10 @@ def change_password(request):
     
     if form.is_valid():
         user = form.save()
-        login(request,user)
-
+        login(request, user)
+        data = {'name': user.username}
+        data['host'] = request.get_host()
+        user.send_email('Password has been changed', 'email/change.txt', 'email/change.html', data)
     return JsonResponse(errors_to_json(form)|{'csrfmiddlewaretoken': csrf.get_token(request)})
 
 @require_POST
@@ -101,6 +115,9 @@ def delete_account(request):
 
         if is_valid:
             user.delete()
+            data = {'name': user.username}
+            data['host'] = request.get_host()
+            user.send_email('Account has been deleted', 'email/delete.txt', 'email/delete.html', data)
             return JsonResponse({'result': 1})
 
         return JsonResponse({'result': 0,'password': 'Incurrect password.'})
@@ -571,16 +588,25 @@ def like_post(request, username, slug):
 def reset_pass(request):
     user = request.user
     if user.is_authenticated:
-        # TODO: send email 
-        print(f"toke: {Token.generate(user).pk}")
+        token = Token.generate(user).pk
+        if settings.DEBUG:
+            print(f"[token] {token}")
+        
+        data = {'name': user.username}
+        data['host'] = request.get_host()
+        data['link'] = f"{request.META['wsgi.url_scheme']}://{data['host']}/accounts/reset-password?token={token}"
+        user.send_email('Reset Password', 'email/reset.txt', 'email/reset.html', data)
+        
         return JsonResponse({'result': 1})
         
     username = request.POST.get('username','')
     query = User.objects.filter(username=username)
     if query.exists():
-        # TODO: send email 
         user = query.first()
-        print(f"toke: {Token.generate(user).pk}")
+        token = Token.generate(user).pk
+        print(f"toke: {token}")
+        link = f'{request.get_host()}/accounts/reset-password?token={token}'
+        user.send_email('Reset Password', 'email/reset.txt', 'email/reset.html', {'name': user.name, 'link': link})
         return JsonResponse({'result': 1})
     return JsonResponse({'result': 0,'username': 'This user does not exist.'})
 

@@ -1,0 +1,2 @@
+Hey {{name}}
+Your account has been deleted in {% now "Y-m-d H:i" %}.

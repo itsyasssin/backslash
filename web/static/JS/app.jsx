@@ -329,7 +329,7 @@ const Auth = ({ page }) => {
         </form>
       )}
       <span className="text-slate-600 py-4 text-sm opacity-100">
-        {`© backslash.com ${year}. All right reserved.`}
+        {`© ${hostName} ${year}. All right reserved.`}
       </span>
     </main>
   );
@@ -440,7 +440,7 @@ const ResetPassword = ({ isSent = false }) => {
       </form>
 
       <span className="text-slate-600 py-4 text-sm opacity-100">
-        {`© backslash.com ${year}. All right reserved.`}
+        {`© ${hostName} ${year}. All right reserved.`}
       </span>
     </main>
   );
@@ -579,7 +579,7 @@ const ChangePassword = ({ isValid = false, token = "" }) => {
       </form>
 
       <span className="text-slate-600 py-4 text-sm opacity-100">
-        {`© backslash.com ${year}. All right reserved.`}
+        {`© ${hostName} ${year}. All right reserved.`}
       </span>
     </main>
   );

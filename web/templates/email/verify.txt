@@ -1,0 +1,5 @@
+Hey {{name}}
+
+For verify your email adress click on the below link.
+
+[ link ] {{link}}

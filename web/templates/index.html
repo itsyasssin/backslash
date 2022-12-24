@@ -38,6 +38,7 @@
     </main>
   </body>
   {% comment %} <script type="text/jsx">
+    const hostName = "{{ host }}";
     const Context = createContext();
     const csrfmiddlewaretoken = "{{ csrfmiddlewaretoken }}";
 
@@ -142,7 +143,7 @@
   {# rendered #}
   <script>
     "use strict";
-
+    const hostName = "{{ host }}";
     const Context = createContext();
     const csrfmiddlewaretoken = "{{ csrfmiddlewaretoken }}";
     const App = () => {

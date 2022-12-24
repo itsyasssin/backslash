@@ -255,7 +255,7 @@ const Auth = ({
     className: `w-full text-center pt-2 text-indigo-600 hover:text-indigo-500 cursor-pointer`
   }, about[status]["help"])), /*#__PURE__*/React.createElement("span", {
     className: "text-slate-600 py-4 text-sm opacity-100"
-  }, `© backslash.com ${year}. All right reserved.`));
+  }, `© ${hostName} ${year}. All right reserved.`));
 };
 const ResetPassword = ({
   isSent = false
@@ -337,7 +337,7 @@ const ResetPassword = ({
     className: `px-4 py-3 w-full mt-1 rounded-full active:scale-[0.98] transition-all flex items-center justify-center bg-gray-900 text-white font-semibold text-lg ${isLoading ? "opacity-50 cursor-wait" : ""}`
   }, "Submit", isLoading ? "..." : "")), /*#__PURE__*/React.createElement("span", {
     className: "text-slate-600 py-4 text-sm opacity-100"
-  }, `© backslash.com ${year}. All right reserved.`));
+  }, `© ${hostName} ${year}. All right reserved.`));
 };
 const ChangePassword = ({
   isValid = false,
@@ -433,7 +433,7 @@ const ChangePassword = ({
     className: `px-4 py-3 w-full mt-1 rounded-full active:scale-[0.98] transition-all flex items-center justify-center bg-gray-900 text-white font-semibold text-lg disabled:opacity-50 disabled:pointer-events-none ${isLoading ? "opacity-50 cursor-wait" : ""}`
   }, "Submit", isLoading ? "..." : "")), /*#__PURE__*/React.createElement("span", {
     className: "text-slate-600 py-4 text-sm opacity-100"
-  }, `© backslash.com ${year}. All right reserved.`));
+  }, `© ${hostName} ${year}. All right reserved.`));
 };
 const Navbar = ({
   state,
