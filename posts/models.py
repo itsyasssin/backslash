@@ -172,3 +172,29 @@ class Comment(models.Model):
 class Image(models.Model):
     user = models.ForeignKey('accounts.MyUser', on_delete=models.CASCADE, related_name="user_images")
     image = models.ImageField(upload_to='images/')
+
+
+class SiteSettings(models.Model):
+    DEFAULT_NAME = 'Backslash'
+    DEFAULT_DESC = 'A weblog :)'
+
+    name = models.CharField(max_length=50,default=DEFAULT_NAME)
+    favicon = models.ImageField(upload_to='images/', blank=True)
+    description =  models.CharField(max_length=150, default=DEFAULT_DESC)
+
+    @classmethod
+    def get_data(cls):
+        last = cls.objects.last()
+        data = {}
+        if last:
+            data['name'] = last.name
+            data['description'] = last.description
+            data['favicon'] = last.favicon
+
+        else:
+            data['name'] = cls.DEFAULT_NAME      
+            data['description'] = cls.DEFAULT_DESC      
+            data['favicon'] = ''
+            
+        return data
+

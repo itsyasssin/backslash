@@ -49,7 +49,7 @@ const showMsg = (message, t = 5000) => {
 // some general function
 const setTitle = e => {
   $("main").scrollTop(0);
-  document.title = "BACKSLASH - " + e.currentTarget.name;
+  document.title = `${siteName} - ` + e.currentTarget.name;
 };
 const timeSince = date => {
   var seconds = Math.floor((new Date() - new Date(date).getTime()) / 1000);
@@ -547,7 +547,7 @@ const Header = ({
     name: "Home",
     onClick: setTitle,
     className: "text-xl mx-4 py-1 px-3 bg-black text-white rounded-xl font-extrabold"
-  }, "BACKSLASH"), loading ? /*#__PURE__*/React.createElement("div", {
+  }, siteName), loading ? /*#__PURE__*/React.createElement("div", {
     className: "h-10 w-24 block px-8 py-2 bg-gray-200 text-white rounded-full mx-4 fadeInLoad overflow-hidden relative"
   }) : !data.me.id ? /*#__PURE__*/React.createElement(Link, {
     name: "Sign in",
@@ -2835,7 +2835,7 @@ const SettingsView = ({}) => {
     className: "py-1 text-xl"
   }, "Photo"), /*#__PURE__*/React.createElement("p", {
     className: "py-1 text-gray-700"
-  }, "Your photo apears on your Profile page and with your posts across Backslash."), /*#__PURE__*/React.createElement("p", {
+  }, "Your photo apears on your Profile page and with your posts across blog."), /*#__PURE__*/React.createElement("p", {
     className: "py-1 text-gray-700"
   }, "Reccomened size: Square, at least 1000 pixels per side. File type: JPG, PNG or GIF")), /*#__PURE__*/React.createElement("div", {
     className: "relative group flex items-center justify-center"

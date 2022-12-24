@@ -4,7 +4,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>BACKSLASH {% if title %}- {{title}}{% endif %}</title>
+    <title>{{sitename}} {% if title %}- {{title}}{% endif %}</title>
+    <link rel="shortcut icon" href="/media/{{favicon}}" type="image/x-icon">
+    <meta name="description" content="{{description}}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
@@ -31,7 +33,7 @@
           id="intro"
           class="text-4xl w-[10ch] text-center whitespace-nowrap overflow-hidden"
         >
-          BACKSLASH
+          {{sitename|upper}}
         </h1>
         <span class="text-gray-500 text-lg">For share your idea</span>
       </main>
@@ -39,6 +41,7 @@
   </body>
   {% comment %} <script type="text/jsx">
     const hostName = "{{ host }}";
+    const siteName = "{{ sitename }}";
     const Context = createContext();
     const csrfmiddlewaretoken = "{{ csrfmiddlewaretoken }}";
 
@@ -144,6 +147,7 @@
   <script>
     "use strict";
     const hostName = "{{ host }}";
+    const siteName = "{{ sitename }}";
     const Context = createContext();
     const csrfmiddlewaretoken = "{{ csrfmiddlewaretoken }}";
     const App = () => {

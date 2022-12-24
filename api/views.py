@@ -14,7 +14,7 @@ from django.middleware import csrf
 from django.views.decorators.http import require_POST, require_GET
 from PIL import Image
 from posts.forms import CommentForm, ImageForm, PostForm
-from posts.models import Post, Tag
+from posts.models import Post, Tag, SiteSettings
 from django.core.exceptions import ObjectDoesNotExist
 from accounts.models import Token
 User = get_user_model()
@@ -22,6 +22,7 @@ User = get_user_model()
 
 @require_POST
 def sign_in(request):
+    SITE_NAME = SiteSettings.get_data()['name']
     if request.user.is_authenticated:
         return JsonResponse({'result': 0})
 
@@ -35,12 +36,14 @@ def sign_in(request):
         login(request, user)
         data = {'name': user.username}
         data['host'] = request.get_host()
-        user.send_email('Login to Backslash', 'email/login.txt', 'email/login.html', data)
+        data['sitename'] = SITE_NAME
+        user.send_email(f'Login to {SITE_NAME}', 'email/login.txt', 'email/login.html', data)
     
     return JsonResponse(errors_to_json(form))
 
 @require_POST
 def sign_up(request):
+    SITE_NAME = SiteSettings.get_data()['name']
     if request.user.is_authenticated:
         return JsonResponse({'result': 0})
 
@@ -67,7 +70,7 @@ def sign_up(request):
         data = {'name': user.username}
         data['host'] = request.get_host()
         data['link'] = f"{request.META['wsgi.url_scheme']}://{data['host']}/accounts/verify?token={token}"
-        user.send_email('Welcome to Backslash', 'email/verify.txt', 'email/verify.html', data)
+        user.send_email(f'Welcome to {SITE_NAME}', 'email/verify.txt', 'email/verify.html', data)
 
     return JsonResponse(errors_to_json(form))
 

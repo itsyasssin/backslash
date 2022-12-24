@@ -46,7 +46,7 @@ const showMsg = (message, t = 5000) => {
 // some general function
 const setTitle = (e) => {
   $("main").scrollTop(0);
-  document.title = "BACKSLASH - " + e.currentTarget.name;
+  document.title = `${siteName} - ` + e.currentTarget.name;
 };
 
 const timeSince = (date) => {
@@ -761,7 +761,7 @@ const Header = ({ loading, state }) => {
           onClick={setTitle}
           className="text-xl mx-4 py-1 px-3 bg-black text-white rounded-xl font-extrabold"
         >
-          BACKSLASH
+          {siteName}
         </Link>
       )}
       {loading ? (
@@ -3307,7 +3307,7 @@ const SettingsView = ({}) => {
                 <h2 className="py-1 text-xl">Photo</h2>
                 <p className="py-1 text-gray-700">
                   Your photo apears on your Profile page and with your posts
-                  across Backslash.
+                  across blog.
                 </p>
                 <p className="py-1 text-gray-700">
                   Reccomened size: Square, at least 1000 pixels per side. File

@@ -1,2 +1,2 @@
 Hey {{name}}
-You log in to backslash in {% now "Y-m-d H:i" %}.
+You log in to {{sitename}} in {% now "Y-m-d H:i" %}.

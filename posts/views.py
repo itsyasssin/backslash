@@ -13,7 +13,8 @@ def index(request):
 def post_detail(request,username, slug):
     query = Post.objects.filter(user__username=username, slug=slug)
     if query.exists():
-        return render(request, 'index.html',{'title': query.first().title})
+        post = query.first()
+        return render(request, 'index.html',{'title': post.title,'about': post.text[:150]})
     raise Http404
     
 def people_view(request,username):
